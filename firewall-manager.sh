@@ -25,8 +25,10 @@ function install_dependencies() {
 }
 
 function read_config_from_user() {
-  echo -e "${YELLOW}📡 Enter the foreign server IP:${NC}"
-  read -rp "IP: " FOREIGN_SERVER_IP
+  read -rp "🔌 Enter allowed ports (comma separated, e.g., 55942,9443,4114): " ports_input
+  ports_input=$(echo "$ports_input" | tr -d '[:space:]' | tr -cd '0-9,')
+  IFS=',' read -ra ALLOWED_PORTS <<< "$ports_input"
+
 
   echo -e "${YELLOW}🔌 Enter allowed ports (comma separated, e.g., 55942,9443,4114):${NC}"
   # حذف فاصله‌های اضافی و کاراکترهای نامناسب
