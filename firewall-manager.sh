@@ -29,7 +29,10 @@ function read_config_from_user() {
   read -rp "IP: " FOREIGN_SERVER_IP
 
   echo -e "${YELLOW}🔌 Enter allowed ports (comma separated, e.g., 55942,9443,4114):${NC}"
-  read -rp "Ports: " ports_input
+  # حذف فاصله‌های اضافی و کاراکترهای نامناسب
+  ports_input=$(echo "$ports_input" | tr -d '[:space:]' | tr -cd '0-9,')
+  IFS=',' read -ra ALLOWED_PORTS <<< "$ports_input"
+
 
   # Split ports into array
   IFS=',' read -ra ALLOWED_PORTS <<< "$ports_input"
