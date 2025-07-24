@@ -25,18 +25,10 @@ function install_dependencies() {
 }
 
 function read_config_from_user() {
+  read -rp "📡 Enter the foreign server IP: " FOREIGN_SERVER_IP
+
   read -rp "🔌 Enter allowed ports (comma separated, e.g., 55942,9443,4114): " ports_input
   ports_input=$(echo "$ports_input" | tr -d '[:space:]' | tr -cd '0-9,')
-  IFS=',' read -ra ALLOWED_PORTS <<< "$ports_input"
-
-
-  echo -e "${YELLOW}🔌 Enter allowed ports (comma separated, e.g., 55942,9443,4114):${NC}"
-  # حذف فاصله‌های اضافی و کاراکترهای نامناسب
-  ports_input=$(echo "$ports_input" | tr -d '[:space:]' | tr -cd '0-9,')
-  IFS=',' read -ra ALLOWED_PORTS <<< "$ports_input"
-
-
-  # Split ports into array
   IFS=',' read -ra ALLOWED_PORTS <<< "$ports_input"
 
   echo -e "${CYAN}[*] Received Configuration:${NC}"
@@ -116,8 +108,8 @@ function show_menu() {
   echo -e "${YELLOW}====== Firewall Management Menu ======${NC}"
   echo "1) Apply restrictions (enter allowed IP and ports)"
   echo "2) Reset firewall to open state"
-  echo "3) Exit"
-  echo -n "Choose an option [1-3]: "
+  echo "0) Exit"
+  echo -n "Choose an option [0-2]: "
 }
 
 while true; do
@@ -132,7 +124,7 @@ while true; do
     2)
       reset_firewall
       ;;
-    3)
+    0)
       echo -e "${GREEN}Goodbye!${NC}"
       exit 0
       ;;
