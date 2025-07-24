@@ -5,7 +5,7 @@
 A simple, powerful, and customizable Bash script to **secure Iranian servers** by:
 
 - Blocking all incoming/outgoing traffic by default
-- Allowing only specific ports from a trusted external IP (e.g. a Germany server)
+- Allowing only specific ports from a trusted external IP (e.g. a foreign server)
 - Disabling ICMP (ping) responses
 - Persisting firewall rules after reboot
 
@@ -42,7 +42,7 @@ chmod +x universal-firewall.sh
 Open the file with your favorite editor and set:
 
 ```bash
-germany_server_ip="1.2.3.4"  # Your external server's IP (e.g., Germany VPS)
+foreign_server_ip="1.2.3.4"  # Your external server's IP (e.g., foreign VPS)
 
 allowed_ports=(2053 10000 10001 10002 10003)  # Replace with your actual tunnel/panel ports
 ```
@@ -61,7 +61,7 @@ sudo ./universal-firewall.sh
 ```bash
 [*] Flushing old iptables rules...
 [*] Allowing localhost traffic...
-[*] Applying firewall rules for germany_server_ip: 1.2.3.4
+[*] Applying firewall rules for foreign_server_ip: 1.2.3.4
  - Allowing port 2053 for 1.2.3.4
  - Allowing port 10000 for 1.2.3.4
  - Allowing port 10001 for 1.2.3.4
