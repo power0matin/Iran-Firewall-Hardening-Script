@@ -1,7 +1,6 @@
 # 🔒 Iran Firewall Hardening Script
 ## [برای مشاهده به زبان فارسی کلیک کنید](README.fa.md)
 
-
 A simple, powerful, and customizable Bash script to **secure Iranian servers** by:
 
 - Blocking all incoming/outgoing traffic by default
@@ -11,7 +10,6 @@ A simple, powerful, and customizable Bash script to **secure Iranian servers** b
 
 > ✅ Designed for projects using tunnels like **Rathole v2**, **Backhaul**, **Xray**, etc.
 
-
 ## 📦 Features
 
 - Fully automated and minimal setup
@@ -20,13 +18,11 @@ A simple, powerful, and customizable Bash script to **secure Iranian servers** b
 - Compatible with `iptables-persistent` for rule saving
 - Lightweight and fast (suitable for production)
 
-
 ## ⚙️ Requirements
 
 - Debian or Ubuntu server (root access)
 - `iptables` installed (default on most systems)
 - `iptables-persistent` (installed automatically by the script)
-
 
 ## 🚀 How to Use
 
@@ -35,7 +31,7 @@ A simple, powerful, and customizable Bash script to **secure Iranian servers** b
 ```bash
 wget https://raw.githubusercontent.com/power0matin/Iran-Firewall-Hardening-Script/main/universal-firewall.sh
 chmod +x universal-firewall.sh
-```
+````
 
 ### 2. Edit the Script
 
@@ -54,6 +50,32 @@ You can list as many ports as you like.
 ```bash
 sudo ./universal-firewall.sh
 ```
+
+
+## 🔄 Reset Firewall (Rollback Script)
+
+If you want to **undo all firewall changes** and restore the server to a fully open state (no restrictions), use the reset script:
+
+1. Download or create `reset-firewall.sh`:
+
+```bash
+wget https://raw.githubusercontent.com/power0matin/Iran-Firewall-Hardening-Script/main/reset-firewall.sh
+chmod +x reset-firewall.sh
+```
+
+2. Run it:
+
+```bash
+sudo ./reset-firewall.sh
+```
+
+This script will:
+
+* Flush all `iptables` rules (all tables)
+* Set default policies to ACCEPT (allow all traffic)
+* Enable ICMP (ping) responses again
+* Remove persistent firewall rules saved on disk
+* Optionally remove `iptables-persistent` package to avoid reloading old rules
 
 
 ## 🧪 Example Output
@@ -78,12 +100,12 @@ sudo ./universal-firewall.sh
 * Test the tunnel from your external server **before** applying final firewall restrictions.
 * If you’re using UDP ports, modify the script to include `-p udp` rules.
 * If the server needs DNS or NTP access, add exceptions for ports `53` and `123` in `OUTPUT` rules.
+* **The reset script completely removes all firewall restrictions** — use only if you want to disable all firewall protections and open the server fully.
 
 
 ## 📄 License
 
 MIT License – use it freely in personal or commercial projects.
-
 
 ## ✨ Credits
 
