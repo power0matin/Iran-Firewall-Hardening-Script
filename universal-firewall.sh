@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # =============== [🔧 Configuration] ===============
-foreign_server_ip="Input_your_foreign_IP"  # Foreign server IP
+foreign_server_ip="1.2.3.4"  # Foreign server IP
 
 # List of ports you want to be open only for the external server (separated by spaces)
 allowed_ports=(2053 10000 10001 10002 10003)  # For example, tunnel port + panel port + inbound port
