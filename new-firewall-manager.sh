@@ -1,196 +1,170 @@
 #!/bin/bash
 set -euo pipefail
 
-# ── Colors ─────────────────────────
-GREEN='\033[0;32m'
-YELLOW='\033[1;33m'
-CYAN='\033[1;36m'
-RED='\033[0;31m'
-NC='\033[0m'
+FIREWALL_LOG="/etc/firewall-manager/last_config.log"
 
-CONFIG_FILE="/etc/firewall_manager/last_config.log"
+mkdir -p /etc/firewall-manager
 
-# ── Root Check ─────────────────────
-if [[ $EUID -ne 0 ]]; then
-  echo -e "${RED}❌ Please run this script as root.${NC}"
+# ANSI Colors
+RED="\033[0;31m"
+GREEN="\033[0;32m"
+YELLOW="\033[1;33m"
+NC="\033[0m"
+
+# Trap Ctrl+C
+trap ctrl_c INT
+function ctrl_c() {
+  echo -e "\n${YELLOW}⚠️  Exiting...${NC}"
   exit 1
-fi
-
-# ── Dependencies ────────────────────
-function install_deps() {
-  echo -e "${CYAN}[*] Installing iptables-persistent...${NC}"
-  apt-get update -y
-  DEBIAN_FRONTEND=noninteractive apt-get install -y iptables-persistent iputils-ping
 }
 
-# ── Validate Input ─────────────────
-function is_valid_ip() {
-  [[ $1 =~ ^([0-9]{1,3}\.){3}[0-9]{1,3}$ ]] && \
-  (awk -F. '{ for(i=1;i<=4;i++) if($i>255){exit 1}}' <<< "$1")
+function validate_ip() {
+  local ip=$1
+  local stat=1
+
+  if [[ $ip =~ ^([0-9]{1,3}\.){3}[0-9]{1,3}$ ]]; then
+    OIFS=$IFS
+    IFS='.' read -r -a ip_array <<< "$ip"
+    IFS=$OIFS
+    [[ ${ip_array[0]} -le 255 && ${ip_array[1]} -le 255 && \
+       ${ip_array[2]} -le 255 && ${ip_array[3]} -le 255 ]]
+    stat=$?
+  fi
+
+  return $stat
 }
 
-function is_valid_port() {
-  [[ $1 =~ ^[0-9]+$ ]] && ((1 <= $1 && $1 <= 65535))
+function validate_ports() {
+  local ports=$1
+  for port in $(echo "$ports" | tr ',' ' '); do
+    if ! [[ $port =~ ^[0-9]+$ ]] || ((port < 1 || port > 65535)); then
+      return 1
+    fi
+  done
+  return 0
 }
 
-# ── Read Config ────────────────────
-function read_config() {
-  local prev_ip prev_tcp prev_udp
-  if [[ -f $CONFIG_FILE ]]; then
-    read -r prev_ip prev_tcp prev_udp < "$CONFIG_FILE"
-    echo -e "${YELLOW}[Loaded previous config]${NC}"
-    printf "IP [%s]: " "$prev_ip"
-    read -r FOREIGN_SERVER_IP
-    FOREIGN_SERVER_IP="${FOREIGN_SERVER_IP:-$prev_ip}"
-
-    printf "TCP ports [%s]: " "$prev_tcp"
-    read -r tre
-    tre="${tre:-$prev_tcp}"
-
-    printf "UDP ports [%s]: " "$prev_udp"
-    read -r ure
-    ure="${ure:-$prev_udp}"
+function ping_check() {
+  echo -e "${YELLOW}🔍 Checking if $1 is reachable...${NC}"
+  if ping -c 1 -W 2 "$1" &>/dev/null; then
+    echo -e "${GREEN}✅ $1 is reachable${NC}"
   else
-    read -rp "Enter foreign server IP: " FOREIGN_SERVER_IP
-    read -rp "Enter TCP ports (comma-separated, e.g. 443,8443): " tre
-    read -rp "Enter UDP ports (comma-separated, e.g. 1194): " ure
+    echo -e "${RED}⚠️  $1 is NOT reachable. Continue anyway? (y/n)${NC}"
+    read -r confirm
+    [[ $confirm == "y" ]] || exit 1
   fi
-
-  # Validate IP
-  if ! is_valid_ip "$FOREIGN_SERVER_IP"; then
-    echo -e "${RED}❌ Invalid IP format.${NC}"
-    exit 1
-  fi
-
-  # Process ports
-  IFS=',' read -ra TCP_PORTS <<< "$(echo "$tre" | tr -cd '0-9,')"
-  IFS=',' read -ra UDP_PORTS <<< "$(echo "$ure" | tr -cd '0-9,')"
-
-  for p in "${TCP_PORTS[@]}"; do is_valid_port "$p" || { echo -e "${RED}❌ Invalid TCP port: $p${NC}"; exit 1; }; done
-  for p in "${UDP_PORTS[@]}"; do is_valid_port "$p" || { echo -e "${RED}❌ Invalid UDP port: $p${NC}"; exit 1; }; done
-
-  echo -e "${CYAN}[*] Configuration:${NC}"
-  echo "  IP: $FOREIGN_SERVER_IP"
-  echo "  TCP ports: ${TCP_PORTS[*]}"
-  echo "  UDP ports: ${UDP_PORTS[*]}"
 }
 
-# ── Save Config ─────────────────────
 function save_config() {
-  mkdir -p "$(dirname "$CONFIG_FILE")"
-  printf "%s\n%s\n%s\n" "$FOREIGN_SERVER_IP" "${TCP_PORTS[*]// /,}" "${UDP_PORTS[*]// /,}" > "$CONFIG_FILE"
+  echo "$1|$2|$3" > "$FIREWALL_LOG"
 }
 
-# ── Ping Test ───────────────────────
-function ping_test() {
-  echo -e "${CYAN}[*] Testing reachability to $FOREIGN_SERVER_IP...${NC}"
-  if ! ping -c1 -W2 "$FOREIGN_SERVER_IP" &>/dev/null; then
-    echo -e "${YELLOW}⚠️ Warning: IP not reachable via ping.${NC}"
-    read -rp "Continue anyway? [y/N]: " yn
-    [[ "${yn,,}" == "y" ]] || exit 1
+function load_config() {
+  if [[ -f $FIREWALL_LOG ]]; then
+    IFS='|' read -r old_ip old_ports old_proto < "$FIREWALL_LOG"
+    echo "$old_ip|$old_ports|$old_proto"
   fi
 }
 
-# ── Apply Firewall ─────────────────
+function show_firewall_status() {
+  echo -e "${YELLOW}🔎 Open ports by IP:${NC}"
+  iptables -L INPUT -n --line-numbers | grep -E "ACCEPT" | grep -v "127.0.0.1"
+}
+
 function apply_firewall() {
-  echo -e "${CYAN}[*] Flushing firewall rules...${NC}"
-  iptables -F && iptables -X && iptables -t nat -F && iptables -t mangle -F
+  echo -e "${YELLOW}[*] Clearing current firewall rules...${NC}"
+  iptables -F
+  iptables -P INPUT DROP
+  iptables -P FORWARD DROP
+  iptables -P OUTPUT ACCEPT
 
-  echo -e "${CYAN}[*] Allowing localhost...${NC}"
+  echo -e "[*] Allowing localhost and SSH..."
   iptables -A INPUT -i lo -j ACCEPT
-  iptables -A OUTPUT -o lo -j ACCEPT
-
-  echo -e "${CYAN}[*] Allowing SSH port 22...${NC}"
   iptables -A INPUT -p tcp --dport 22 -j ACCEPT
-  iptables -A OUTPUT -p tcp --sport 22 -j ACCEPT
 
-  echo -e "${CYAN}[*] Allowing TCP ports from $FOREIGN_SERVER_IP...${NC}"
-  for p in "${TCP_PORTS[@]}"; do
-    iptables -A INPUT -p tcp -s "$FOREIGN_SERVER_IP" --dport "$p" -j ACCEPT
-    iptables -A OUTPUT -p tcp -d "$FOREIGN_SERVER_IP" --sport "$p" -j ACCEPT
+  for port in $(echo "$2" | tr ',' ' '); do
+    if [[ "$3" == "TCP" || "$3" == "BOTH" ]]; then
+      iptables -A INPUT -p tcp -s "$1" --dport "$port" -j ACCEPT
+    fi
+    if [[ "$3" == "UDP" || "$3" == "BOTH" ]]; then
+      iptables -A INPUT -p udp -s "$1" --dport "$port" -j ACCEPT
+    fi
   done
 
-  if (( ${#UDP_PORTS[@]} )); then
-    echo -e "${CYAN}[*] Allowing UDP ports from $FOREIGN_SERVER_IP...${NC}"
-    for p in "${UDP_PORTS[@]}"; do
-      iptables -A INPUT -p udp -s "$FOREIGN_SERVER_IP" --dport "$p" -j ACCEPT
-      iptables -A OUTPUT -p udp -d "$FOREIGN_SERVER_IP" --sport "$p" -j ACCEPT
-    done
-  fi
-
-  echo -e "${CYAN}[*] Setting default DROP policies...${NC}"
-  iptables -P INPUT DROP && iptables -P OUTPUT DROP && iptables -P FORWARD DROP
-
-  echo -e "${CYAN}[*] Disabling ICMP ping...${NC}"
-  [[ "$(grep -c net.ipv4.icmp_echo_ignore_all /etc/sysctl.conf)" -eq 0 ]] && echo "net.ipv4.icmp_echo_ignore_all = 1" >> /etc/sysctl.conf
+  echo -e "[*] Blocking ping (ICMP)..."
+  echo 'net.ipv4.icmp_echo_ignore_all = 1' >> /etc/sysctl.conf
   sysctl -p
 
-  echo -e "${CYAN}[*] Saving rules...${NC}"
-  iptables-save > /etc/iptables/rules.v4
-
-  echo -e "${GREEN}[✅] Firewall applied.${NC}"
+  save_config "$1" "$2" "$3"
+  netfilter-persistent save
+  echo -e "${GREEN}✅ Firewall rules applied successfully!${NC}"
 }
 
-# ── Reset Firewall ─────────────────
 function reset_firewall() {
-  echo -e "${CYAN}[*] Resetting firewall...${NC}"
-  iptables -F && iptables -X && iptables -t nat -F && iptables -t mangle -F
-  iptables -P INPUT ACCEPT && iptables -P OUTPUT ACCEPT && iptables -P FORWARD ACCEPT
-
-  echo -e "${CYAN}[*] Enabling ICMP ping...${NC}"
-  sed -i '/net.ipv4.icmp_echo_ignore_all/d' /etc/sysctl.conf
-  sysctl -w net.ipv4.icmp_echo_ignore_all=0
-
-  echo -e "${CYAN}[*] Removing saved rules..."${NC}
-  [[ -f /etc/iptables/rules.v4 ]] && rm -f /etc/iptables/rules.v4
-
-  echo -e "${CYAN}[*] Removing iptables-persistent...${NC}"
-  apt-get remove --purge -y iptables-persistent
-
-  echo -e "${GREEN}[✅] Firewall reset and opened.${NC}"
+  iptables -F
+  iptables -P INPUT ACCEPT
+  iptables -P FORWARD ACCEPT
+  iptables -P OUTPUT ACCEPT
+  sed -i '/icmp_echo_ignore_all/d' /etc/sysctl.conf
+  sysctl -p
+  netfilter-persistent save
+  echo -e "${GREEN}✅ Firewall reset to open state.${NC}"
 }
 
-# ── Show Status ────────────────────
-function show_status() {
-  echo -e "${CYAN}[*] Open firewall ports: ${NC}"
-  iptables -L -n | grep -E 'ACCEPT.*'$FOREIGN_SERVER_IP
-}
-
-# ── Menu ───────────────────────────
 function show_menu() {
-  echo -e "${YELLOW}====== Firewall Management ======${NC}"
-  echo "1) Apply restrictions (TCP/UDP)"
-  echo "2) Show current firewall status"
-  echo "3) Reset firewall to open"
+  echo -e "${YELLOW}====== Firewall Manager ======${NC}"
+  echo "1) Apply Firewall Rules"
+  echo "2) Show Firewall Status"
+  echo "3) Reset Firewall"
   echo "0) Exit"
-  echo -n "Choose [0-3]: "
-}
-
-# ── Main Loop ─────────────────────
-while true; do
-  show_menu
+  echo -n "Choose an option [0-3]: "
   read -r choice
+
   case $choice in
     1)
-      install_deps
-      read_config
-      ping_test
-      apply_firewall
-      save_config
+      config=$(load_config || true)
+      IFS='|' read -r def_ip def_ports def_proto <<< "$config"
+
+      echo -n "📡 Enter IP [${def_ip:-None}]: "
+      read -r ip
+      ip="${ip:-$def_ip}"
+      validate_ip "$ip" || { echo -e "${RED}❌ Invalid IP.${NC}"; exit 1; }
+
+      echo -n "🔌 Enter ports (comma-separated) [${def_ports:-None}]: "
+      read -r ports
+      ports="${ports:-$def_ports}"
+      validate_ports "$ports" || { echo -e "${RED}❌ Invalid ports.${NC}"; exit 1; }
+
+      echo -n "📦 Protocol (TCP/UDP/BOTH) [${def_proto:-TCP}]: "
+      read -r proto
+      proto="${proto:-${def_proto:-TCP}}"
+
+      ping_check "$ip"
+      apply_firewall "$ip" "$ports" "$proto"
       ;;
     2)
-      show_status
+      show_firewall_status
       ;;
     3)
       reset_firewall
       ;;
     0)
-      echo -e "${GREEN}Goodbye!${NC}"
+      echo -e "${YELLOW}Bye.${NC}"
       exit 0
       ;;
     *)
       echo -e "${RED}Invalid option.${NC}"
       ;;
   esac
-  echo
+}
+
+# Ensure iptables-persistent is installed
+if ! command -v netfilter-persistent >/dev/null; then
+  echo -e "${YELLOW}Installing iptables-persistent...${NC}"
+  apt update >/dev/null && apt install -y iptables-persistent
+fi
+
+while true; do
+  show_menu
+  echo ""
 done
