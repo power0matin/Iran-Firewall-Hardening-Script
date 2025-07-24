@@ -51,7 +51,7 @@ nano universal-firewall.sh
 در ابتدای فایل، این مقادیر را به دلخواه تغییر دهید:
 
 ```bash
-germany_server_ip="1.2.3.4"       # آی‌پی سرور خارجی
+foreign_server_ip="1.2.3.4"       # آی‌پی سرور خارجی
 allowed_ports=(2053 10000 10001)  # لیست پورت‌هایی که سرور خارجی اجازه دسترسی دارد
 ```
 
@@ -70,7 +70,7 @@ sudo ./universal-firewall.sh
 ```bash
 [*] Flushing old iptables rules...
 [*] Allowing localhost traffic...
-[*] Applying firewall rules for germany_server_ip: 1.2.3.4
+[*] Applying firewall rules for foreign_server_ip: 1.2.3.4
  - Allowing port 2053 for 1.2.3.4
  - Allowing port 10000 for 1.2.3.4
  - Allowing port 10001 for 1.2.3.4
@@ -84,7 +84,7 @@ sudo ./universal-firewall.sh
 
 ## ⚠️ هشدار مهم
 
-* اگر `germany_server_ip` را اشتباه وارد کنید یا پورت‌ها را غلط تنظیم کنید، **ممکن است دسترسی SSH به سرور قطع شود.**
+* اگر `foreign_server_ip` را اشتباه وارد کنید یا پورت‌ها را غلط تنظیم کنید، **ممکن است دسترسی SSH به سرور قطع شود.**
 * قبل از اجرای نهایی، اتصال تونل را از سرور خارجی تست کنید.
 * اگر نیاز به دسترسی DNS یا NTP دارید، باید پورت‌های `53` و `123` را در خروجی باز بگذارید.
 
