@@ -1,74 +1,65 @@
 # 🔥 Iran Firewall Manager
 ## [برای مشاهده به زبان فارسی کلیک کنید](README.fa.md)
 
-A **powerful interactive Bash script** to secure Iranian servers by strictly controlling allowed connections and ports.
+An **interactive and secure Bash script** to harden Iranian servers by strictly controlling which IPs and ports are allowed — perfect for tunneling setups.
 
-> ✅ Designed for use cases involving tunnels like **Rathole v2**, **Backhaul**, **Xray**, or **personal tunneling projects**
-
-
-## 🛡️ What This Script Does
-
-- 🔐 Blocks **all inbound/outbound** traffic by default
-- 🎯 Allows access to **specific ports from a foreign (non-Iranian) IP**
-- 🚫 Disables **ICMP ping responses**
-- 💾 Saves firewall rules with `iptables-persistent` to survive reboots
-- 📥 Provides a **reset option** to fully undo all changes
+> ✅ Designed for tunnels like **Rathole v2**, **Backhaul**, **Xray**, or private proxy systems
 
 
-## 📦 Features
+## 🛡️ Key Features
 
-- Interactive menu (no need to modify the script manually)
-- Simple, clean CLI interface with emoji-enhanced prompts
-- Supports **multiple ports**, entered as a comma-separated list
-- Disables `ping` (optional, auto-enabled)
-- Compatible with system startup using `iptables-persistent`
-- Lightweight and safe for production use
+- ❌ Blocks all incoming/outgoing traffic by default
+- 🌍 Allows only specific ports from a **foreign (non-Iranian)** server IP
+- 🔕 Disables ping (ICMP) to prevent scanning
+- 💾 Automatically saves firewall rules via `iptables-persistent`
+- 🔁 Includes a full **reset option** to remove all restrictions
+- 📱 Interactive menu with emoji prompts – no need to edit the script
+
+
+## 🚀 One-Line Install & Run
+
+Use this single command to run the script directly:
+
+```bash
+bash <(curl -Ls https://raw.githubusercontent.com/power0matin/Iran-Firewall-Manager/main/firewall-manager.sh)
+````
+
+You’ll be guided through:
+
+* Entering your foreign server IP
+* Defining which ports to allow
+* Applying or resetting firewall rules
 
 
 ## ⚙️ Requirements
 
-- ✅ Debian or Ubuntu (root access required)
-- ✅ `iptables` and `iptables-persistent` (installed automatically)
+* ✅ Ubuntu or Debian-based system
+* 🧑‍💻 Root access (the script checks and enforces it)
+* 🧩 `iptables` and `iptables-persistent` (installed automatically)
 
 
-## 🚀 How to Use
+## 📋 Menu Options
 
-### Step 1 – Download and Run
-
-```bash
-wget https://raw.githubusercontent.com/power0matin/Iran-Firewall-Hardening-Script/main/firewall-manager.sh
-chmod +x firewall-manager.sh
-sudo ./firewall-manager.sh
-````
-
-
-## 📋 What You'll Be Asked
-
-The script will ask:
-
-1. The **foreign server IP address** (e.g., your external VPS)
-2. The list of **allowed ports** (e.g., `443,8443,50000`)
-
-Then it will:
-
-* Apply iptables rules
-* Save them
-* Disable ping
-* Set default DROP policy on all chains
+```
+====== Firewall Management Menu ======
+1) Apply restrictions (enter allowed IP and ports)
+2) Reset firewall to open state
+0) Exit
+```
 
 
-## 🔄 Reset Firewall to Open State
+## 🔄 Resetting the Firewall
 
-You can also **reset** everything via menu option 2:
+Use option `2` in the menu to fully undo all changes:
 
-* Flush all iptables rules (all chains/tables)
-* Set all default policies to `ACCEPT`
-* Enable ICMP (ping)
-* Delete `iptables-persistent` rules file
-* Optionally remove `iptables-persistent` package
+* Flush all `iptables` rules
+* Set all chains to `ACCEPT`
+* Enable ping again
+* Remove persistent rule files
+* Uninstall `iptables-persistent`
 
 
-## 📷 Sample Output
+## 📦 Example Output
 
 ```bash
 [*] Installing iptables-persistent...
@@ -87,35 +78,33 @@ You can also **reset** everything via menu option 2:
 
 ## ⚠️ Warnings
 
-> 🛑 **Incorrect IP = Locked out!**
-> Make absolutely sure the IP address you enter is your **external trusted server** (not your current local IP). Test tunnel first.
+> 🛑 **Be very careful with the IP you enter.**
+> If you enter the wrong IP, you may **lose SSH access** to your server. Always test the tunnel before applying firewall rules.
 
-> 🟡 **Need DNS/NTP?**
-> If your service requires DNS or time syncing, you should **manually add OUTPUT rules for**:
+> 🧠 **Need extra ports like DNS/NTP?**
+> You can add rules manually before saving:
 
 ```bash
 iptables -A OUTPUT -p udp --dport 53 -j ACCEPT  # DNS
 iptables -A OUTPUT -p udp --dport 123 -j ACCEPT # NTP
 ```
 
-> 🧠 **UDP Support**
-> Currently the script only opens **TCP ports**. You can edit and duplicate the port rules with `-p udp` if your service needs it.
+> 📡 **UDP support** is not included by default. To allow UDP ports, you must add `-p udp` versions of your allowed rules manually.
 
 
-## 🧪 Tested On
+## ✅ Tested On
 
-* Ubuntu 22.04 / 20.04
-* Debian 11 / 12
-* KVM VPS instances inside Iran
-* OpenVZ and NAT-VPS scenarios
-
-
-## 📝 License
-
-[MIT License](LICENSE) – free for personal, commercial, or open-source projects.
+* ✅ Ubuntu 20.04 / 22.04
+* ✅ Debian 11 / 12
+* ✅ KVM, OpenVZ, NAT VPS (IPv4 only)
 
 
-## ✨ Credits
+## 📄 License
 
-Created by [power0matin](https://github.com/power0matin)
-If you like this, please ⭐ the repo and share it with your network!
+MIT License – free for personal, educational, or commercial use.
+
+
+## ✨ Author
+
+Created with ❤️ by [power0matin](https://github.com/power0matin)
+If you find this useful, please ⭐ the repo and share it!
