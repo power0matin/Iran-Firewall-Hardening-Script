@@ -101,7 +101,7 @@ iptables -A OUTPUT -p udp --dport 123 -j ACCEPT # NTP
 
 ## 📄 License
 
-MIT License – free for personal, educational, or commercial use.
+[MIT License](LICENSE) – free for personal, educational, or commercial use.
 
 
 ## ✨ Author
