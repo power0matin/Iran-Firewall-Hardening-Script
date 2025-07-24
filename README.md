@@ -87,4 +87,4 @@ MIT License – use it freely in personal or commercial projects.
 
 ## ✨ Credits
 
-Created by [YourName](https://github.com/power0matin) for secure tunnel deployments inside Iran.
+Created by [power0matin](https://github.com/power0matin) for secure tunnel deployments inside Iran.
