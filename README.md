@@ -112,7 +112,7 @@ iptables -A OUTPUT -p udp --dport 123 -j ACCEPT # NTP
 
 ## 📝 License
 
-MIT License – free for personal, commercial, or open-source projects.
+[MIT License](LICENSE) – free for personal, commercial, or open-source projects.
 
 
 ## ✨ Credits
