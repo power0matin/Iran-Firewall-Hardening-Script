@@ -1,112 +1,121 @@
-# 🔒 Iran Firewall Hardening Script
+# 🔥 Iran Firewall Manager
 ## [برای مشاهده به زبان فارسی کلیک کنید](README.fa.md)
 
-A simple, powerful, and customizable Bash script to **secure Iranian servers** by:
+A **powerful interactive Bash script** to secure Iranian servers by strictly controlling allowed connections and ports.
 
-- Blocking all incoming/outgoing traffic by default
-- Allowing only specific ports from a trusted external IP (e.g. a foreign server)
-- Disabling ICMP (ping) responses
-- Persisting firewall rules after reboot
+> ✅ Designed for use cases involving tunnels like **Rathole v2**, **Backhaul**, **Xray**, or **personal tunneling projects**
 
-> ✅ Designed for projects using tunnels like **Rathole v2**, **Backhaul**, **Xray**, etc.
+
+## 🛡️ What This Script Does
+
+- 🔐 Blocks **all inbound/outbound** traffic by default
+- 🎯 Allows access to **specific ports from a foreign (non-Iranian) IP**
+- 🚫 Disables **ICMP ping responses**
+- 💾 Saves firewall rules with `iptables-persistent` to survive reboots
+- 📥 Provides a **reset option** to fully undo all changes
+
 
 ## 📦 Features
 
-- Fully automated and minimal setup
-- Works on any number of ports (just list them)
-- Prevents access from all other sources (including Iran)
-- Compatible with `iptables-persistent` for rule saving
-- Lightweight and fast (suitable for production)
+- Interactive menu (no need to modify the script manually)
+- Simple, clean CLI interface with emoji-enhanced prompts
+- Supports **multiple ports**, entered as a comma-separated list
+- Disables `ping` (optional, auto-enabled)
+- Compatible with system startup using `iptables-persistent`
+- Lightweight and safe for production use
+
 
 ## ⚙️ Requirements
 
-- Debian or Ubuntu server (root access)
-- `iptables` installed (default on most systems)
-- `iptables-persistent` (installed automatically by the script)
+- ✅ Debian or Ubuntu (root access required)
+- ✅ `iptables` and `iptables-persistent` (installed automatically)
+
 
 ## 🚀 How to Use
 
-### 1. Clone or Copy the Script
+### Step 1 – Download and Run
 
 ```bash
-wget https://raw.githubusercontent.com/power0matin/Iran-Firewall-Hardening-Script/main/universal-firewall.sh
-chmod +x universal-firewall.sh
+wget https://raw.githubusercontent.com/power0matin/Iran-Firewall-Hardening-Script/main/firewall-manager.sh
+chmod +x firewall-manager.sh
+sudo ./firewall-manager.sh
 ````
 
-### 2. Edit the Script
 
-Open the file with your favorite editor and set:
+## 📋 What You'll Be Asked
 
-```bash
-foreign_server_ip="1.2.3.4"  # Your external server's IP (e.g., foreign VPS)
+The script will ask:
 
-allowed_ports=(2053 10000 10001 10002 10003)  # Replace with your actual tunnel/panel ports
-```
+1. The **foreign server IP address** (e.g., your external VPS)
+2. The list of **allowed ports** (e.g., `443,8443,50000`)
 
-You can list as many ports as you like.
+Then it will:
 
-### 3. Run the Script
-
-```bash
-sudo ./universal-firewall.sh
-```
+* Apply iptables rules
+* Save them
+* Disable ping
+* Set default DROP policy on all chains
 
 
-## 🔄 Reset Firewall (Rollback Script)
+## 🔄 Reset Firewall to Open State
 
-If you want to **undo all firewall changes** and restore the server to a fully open state (no restrictions), use the reset script:
+You can also **reset** everything via menu option 2:
 
-1. Download or create `reset-firewall.sh`:
+* Flush all iptables rules (all chains/tables)
+* Set all default policies to `ACCEPT`
+* Enable ICMP (ping)
+* Delete `iptables-persistent` rules file
+* Optionally remove `iptables-persistent` package
 
-```bash
-wget https://raw.githubusercontent.com/power0matin/Iran-Firewall-Hardening-Script/main/reset-firewall.sh
-chmod +x reset-firewall.sh
-```
 
-2. Run it:
+## 📷 Sample Output
 
 ```bash
-sudo ./reset-firewall.sh
-```
-
-This script will:
-
-* Flush all `iptables` rules (all tables)
-* Set default policies to ACCEPT (allow all traffic)
-* Enable ICMP (ping) responses again
-* Remove persistent firewall rules saved on disk
-* Optionally remove `iptables-persistent` package to avoid reloading old rules
-
-
-## 🧪 Example Output
-
-```bash
-[*] Flushing old iptables rules...
-[*] Allowing localhost traffic...
-[*] Applying firewall rules for foreign_server_ip: 1.2.3.4
- - Allowing port 2053 for 1.2.3.4
- - Allowing port 10000 for 1.2.3.4
- - Allowing port 10001 for 1.2.3.4
-[*] Blocking all other traffic...
-[*] Disabling ping response (ICMP)...
 [*] Installing iptables-persistent...
-[✅] Done. Only these ports are open to 1.2.3.4: 2053 10000 10001
+[*] Flushing existing firewall rules...
+[*] Allowing localhost traffic...
+[*] Allowing SSH on port 22...
+[*] Applying rules for IP 1.2.3.4 and allowed ports...
+  - Allowing port 443 from 1.2.3.4
+  - Allowing port 8443 from 1.2.3.4
+[*] Setting default policy to DROP...
+[*] Disabling ICMP echo (ping)...
+[*] Saving iptables rules...
+[✅] Firewall rules applied successfully.
 ```
 
 
-## ⚠️ Important Notes
+## ⚠️ Warnings
 
-* Be sure you enter the **correct external IP** before running. Otherwise, you may lose SSH access to the server.
-* Test the tunnel from your external server **before** applying final firewall restrictions.
-* If you’re using UDP ports, modify the script to include `-p udp` rules.
-* If the server needs DNS or NTP access, add exceptions for ports `53` and `123` in `OUTPUT` rules.
-* **The reset script completely removes all firewall restrictions** — use only if you want to disable all firewall protections and open the server fully.
+> 🛑 **Incorrect IP = Locked out!**
+> Make absolutely sure the IP address you enter is your **external trusted server** (not your current local IP). Test tunnel first.
+
+> 🟡 **Need DNS/NTP?**
+> If your service requires DNS or time syncing, you should **manually add OUTPUT rules for**:
+
+```bash
+iptables -A OUTPUT -p udp --dport 53 -j ACCEPT  # DNS
+iptables -A OUTPUT -p udp --dport 123 -j ACCEPT # NTP
+```
+
+> 🧠 **UDP Support**
+> Currently the script only opens **TCP ports**. You can edit and duplicate the port rules with `-p udp` if your service needs it.
 
 
-## 📄 License
+## 🧪 Tested On
 
-MIT License – use it freely in personal or commercial projects.
+* Ubuntu 22.04 / 20.04
+* Debian 11 / 12
+* KVM VPS instances inside Iran
+* OpenVZ and NAT-VPS scenarios
+
+
+## 📝 License
+
+MIT License – free for personal, commercial, or open-source projects.
+
 
 ## ✨ Credits
 
-Created by [power0matin](https://github.com/power0matin) for secure tunnel deployments inside Iran.
+Created by [power0matin](https://github.com/power0matin)
+If you like this, please ⭐ the repo and share it with your network!
