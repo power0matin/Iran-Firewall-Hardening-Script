@@ -1,6 +1,6 @@
-
-
 # 🔒 Iran Firewall Hardening Script
+## [برای مشاهده به زبان فارسی کلیک کنید](README.fa.md)
+
 
 A simple, powerful, and customizable Bash script to **secure Iranian servers** by:
 
