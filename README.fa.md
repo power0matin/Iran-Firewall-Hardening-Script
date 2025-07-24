@@ -38,10 +38,10 @@ bash <(curl -Ls https://raw.githubusercontent.com/power0matin/Iran-Firewall-Mana
 ## 📋 منوی اسکریپت
 
 ```
-====== منوی مدیریت فایروال ======
-1) اعمال محدودیت‌ها (وارد کردن آی‌پی و پورت‌ها)
-2) بازگردانی کامل فایروال (حالت باز)
-0) خروج
+====== Firewall Management Menu ======
+1) Apply restrictions (enter allowed IP and ports)
+2) Reset firewall to open state
+0) Exit
 ```
 
 ## 🔄 بازگردانی کامل فایروال
@@ -61,9 +61,9 @@ bash <(curl -Ls https://raw.githubusercontent.com/power0matin/Iran-Firewall-Mana
 [*] Flushing existing firewall rules...
 [*] Allowing localhost traffic...
 [*] Allowing SSH on port 22...
-[*] Applying rules for IP 5.6.7.8 and allowed ports...
-  - Allowing port 443 from 5.6.7.8
-  - Allowing port 8443 from 5.6.7.8
+[*] Applying rules for IP 1.2.3.4 and allowed ports...
+  - Allowing port 443 from 1.2.3.4
+  - Allowing port 8443 from 1.2.3.4
 [*] Setting default policy to DROP...
 [*] Disabling ICMP echo (ping)...
 [*] Saving iptables rules...
@@ -94,7 +94,7 @@ iptables -A OUTPUT -p udp --dport 123 -j ACCEPT
 
 ## 📄 مجوز استفاده
 
-منتشر شده تحت لایسنس MIT
+منتشر شده تحت [لایسنس MIT](LICENSE)
 استفاده از آن برای پروژه‌های شخصی، آموزشی یا تجاری **کاملاً آزاد است**
 
 ## 👤 سازنده
