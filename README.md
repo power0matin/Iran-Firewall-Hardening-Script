@@ -1,4 +1,4 @@
-# 🔥 Iran Firewall Manager
+# 🔥 Iran Firewall Manager  
 ## [برای مشاهده به زبان فارسی کلیک کنید](README.fa.md)
 
 An **interactive and secure Bash script** to harden Iranian servers by strictly controlling which IPs and ports are allowed — perfect for tunneling setups.
@@ -8,56 +8,38 @@ An **interactive and secure Bash script** to harden Iranian servers by strictly 
 
 ## 🛡️ Key Features
 
-- ❌ Blocks all incoming/outgoing traffic by default
-- 🌍 Allows only specific ports from a **foreign (non-Iranian)** server IP
-- 🔕 Disables ping (ICMP) to prevent scanning
-- 💾 Automatically saves firewall rules via `iptables-persistent`
-- 🔁 Includes a full **reset option** to remove all restrictions
-- 📱 Interactive menu with emoji prompts – no need to edit the script
-
+- ❌ Blocks all incoming/outgoing traffic by default  
+- 🌍 Allows only specific ports from a **foreign (non-Iranian)** server IP  
+- 🔕 Disables ping (ICMP) to prevent scanning  
+- 💾 Automatically saves firewall rules via `iptables-persistent`  
+- 🔁 Includes a full **reset option** to remove all restrictions  
+- 📱 Interactive menu with emoji prompts – no need to edit the script  
+- 🔐 Supports **TCP / UDP / Both** rules  
+- 🧠 Remembers **last used config** (IP + ports)  
+- 🧪 Verifies foreign IP with **Ping test**  
+- 📋 Shows currently open ports & allowed IPs  
+- ✅ Fully interactive – no manual rule writing needed  
 
 ## 🚀 One-Line Install & Run
 
-Use this single command to run the script directly:
+Use the following command to run the **latest enhanced version** (v2):
+
+```bash
+bash <(curl -Ls https://raw.githubusercontent.com/power0matin/Iran-Firewall-Manager/main/firewall-manager-v2.sh)
+```
+
+> ✅ Recommended: Includes all new features like UDP support, connection tests, persistent config memory, and port status view.
+
+
+### 🧪 Legacy Version (Minimal Features)
+
+If you prefer the simpler original version (v1), use:
 
 ```bash
 bash <(curl -Ls https://raw.githubusercontent.com/power0matin/Iran-Firewall-Manager/main/firewall-manager.sh)
-````
-
-You’ll be guided through:
-
-* Entering your foreign server IP
-* Defining which ports to allow
-* Applying or resetting firewall rules
-
-
-## ⚙️ Requirements
-
-* ✅ Ubuntu or Debian-based system
-* 🧑‍💻 Root access (the script checks and enforces it)
-* 🧩 `iptables` and `iptables-persistent` (installed automatically)
-
-
-## 📋 Menu Options
-
-```
-====== Firewall Management Menu ======
-1) Apply restrictions (enter allowed IP and ports)
-2) Reset firewall to open state
-0) Exit
 ```
 
-
-## 🔄 Resetting the Firewall
-
-Use option `2` in the menu to fully undo all changes:
-
-* Flush all `iptables` rules
-* Set all chains to `ACCEPT`
-* Enable ping again
-* Remove persistent rule files
-* Uninstall `iptables-persistent`
-
+> ⚠️ Note: Lacks advanced menu, validation, and extended features.
 
 ## 📦 Example Output
 
@@ -67,12 +49,24 @@ Use option `2` in the menu to fully undo all changes:
 [*] Allowing localhost traffic...
 [*] Allowing SSH on port 22...
 [*] Applying rules for IP 1.2.3.4 and allowed ports...
-  - Allowing port 443 from 1.2.3.4
-  - Allowing port 8443 from 1.2.3.4
+  - Allowing TCP port 443 from 1.2.3.4
+  - Allowing UDP port 443 from 1.2.3.4
 [*] Setting default policy to DROP...
 [*] Disabling ICMP echo (ping)...
 [*] Saving iptables rules...
 [✅] Firewall rules applied successfully.
+```
+
+
+## 📋 Menu Options
+
+```
+====== Firewall Management Menu ======
+1) Apply secure firewall restrictions
+2) Reset firewall to open state
+3) Show currently open ports
+4) Enable secure mode (allow only selected IP and ports)
+0) Exit
 ```
 
 
@@ -85,18 +79,55 @@ Use option `2` in the menu to fully undo all changes:
 > You can add rules manually before saving:
 
 ```bash
-iptables -A OUTPUT -p udp --dport 53 -j ACCEPT  # DNS
-iptables -A OUTPUT -p udp --dport 123 -j ACCEPT # NTP
+iptables -A OUTPUT -p udp --dport 53 -j ACCEPT  # DNS  
+iptables -A OUTPUT -p udp --dport 123 -j ACCEPT # NTP  
 ```
 
-> 📡 **UDP support** is not included by default. To allow UDP ports, you must add `-p udp` versions of your allowed rules manually.
+> 📡 UDP is now **supported** via the interactive menu. Choose `TCP`, `UDP`, or `Both` when prompted.
+
+
+## 🧱 Project Phases (Upcoming)
+
+The project will continue to evolve with new features and enhancements:
+
+### ✅ Phase 1: Current Version (v2)
+
+* ✅ Menu-based TCP/UDP firewall setup
+* ✅ IP/Port validation
+* ✅ Ping check before applying rules
+* ✅ Persistent config saving (`last_config.log`)
+* ✅ Open ports viewer
+
+### 🔜 Phase 2: Advanced Usability
+
+* ⏳ Auto-revert in case of wrong config (e.g., 2-minute timeout)
+* 🕒 Scheduled rule sets (day/night separation with cron)
+* 🔁 Multiple saved profiles (e.g., dev / prod modes)
+* 📅 GeoIP blocking support
+
+### 🧠 Phase 3: Smart Automation
+
+* 📊 Real-time traffic stats (iftop, conntrack)
+* ⚠️ Intrusion alert system via Telegram bot
+* 📥 Centralized logging to external server
+* 👥 Multi-admin audit logs
+* 📦 Docker/container-aware rules
+
+If you'd like to suggest a feature, open an [Issue](https://github.com/power0matin/Iran-Firewall-Manager/issues)!
+
+
+## ⚙️ Requirements
+
+* ✅ Ubuntu or Debian-based server
+* 🧑‍💻 Root access
+* 📦 `iptables` and `iptables-persistent` (auto-installed)
 
 
 ## ✅ Tested On
 
-* ✅ Ubuntu 20.04 / 22.04
-* ✅ Debian 11 / 12
-* ✅ KVM, OpenVZ, NAT VPS (IPv4 only)
+* Ubuntu 20.04 / 22.04
+* Debian 11 / 12
+* VPS types: KVM, NAT, OpenVZ (IPv4 only)
 
 
 ## 📄 License
