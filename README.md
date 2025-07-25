@@ -1,45 +1,47 @@
 # 🔥 Iran Firewall Manager  
-## [برای مشاهده به زبان فارسی کلیک کنید](README.fa.md)
+## [🇮🇷 مشاهده نسخه فارسی](README.fa.md)
 
-An **interactive and secure Bash script** to harden Iranian servers by strictly controlling which IPs and ports are allowed — perfect for tunneling setups.
+An **interactive and secure Bash script** to harden Iranian servers by strictly controlling which IPs and ports are allowed — ideal for tunneling setups.
 
-> ✅ Designed for tunnels like **Rathole v2**, **Backhaul**, **Xray**, or private proxy systems
+> ✅ Tailored for tunnels like **Rathole v2**, **Backhaul**, **Xray**, or private proxy systems.
 
 
 ## 🛡️ Key Features
 
-- ❌ Blocks all incoming/outgoing traffic by default  
-- 🌍 Allows only specific ports from a **foreign (non-Iranian)** server IP  
-- 🔕 Disables ping (ICMP) to prevent scanning  
-- 💾 Automatically saves firewall rules via `iptables-persistent`  
-- 🔁 Includes a full **reset option** to remove all restrictions  
-- 📱 Interactive menu with emoji prompts – no need to edit the script  
-- 🔐 Supports **TCP / UDP / Both** rules  
-- 🧠 Remembers **last used config** (IP + ports)  
-- 🧪 Verifies foreign IP with **Ping test**  
-- 📋 Shows currently open ports & allowed IPs  
-- ✅ Fully interactive – no manual rule writing needed  
+- ❌ Block all traffic (inbound & outbound) by default  
+- 🌍 Allow only specific ports from a **foreign (non-Iranian)** server IP  
+- 🔕 Disable ICMP (ping) to avoid discovery  
+- 💾 Auto-save rules via `iptables-persistent`  
+- 🔁 One-click **reset** to default open state  
+- 📱 Interactive emoji-powered menu – no editing needed  
+- 🔐 TCP / UDP / Both rule support  
+- 🧠 Remembers last used IP & ports  
+- 🧪 Ping test to verify foreign IP reachability  
+- 📋 View open ports and allowed IPs  
+- ✅ All interactive – no manual iptables usage required
+
 
 ## 🚀 One-Line Install & Run
 
-Use the following command to run the **latest enhanced version** (v2):
+Run the **latest enhanced version (v2)** with all features:
 
 ```bash
 bash <(curl -Ls https://raw.githubusercontent.com/power0matin/Iran-Firewall-Manager/main/firewall-manager-v2.sh)
 ```
 
-> ✅ Recommended: Includes all new features like UDP support, connection tests, persistent config memory, and port status view.
+> ✅ **Recommended**: Includes full menu, UDP support, persistent config, and port visibility.
 
 
 ### 🧪 Legacy Version (Minimal Features)
 
-If you prefer the simpler original version (v1), use:
+For the original minimal script:
 
 ```bash
 bash <(curl -Ls https://raw.githubusercontent.com/power0matin/Iran-Firewall-Manager/main/firewall-manager.sh)
 ```
 
-> ⚠️ Note: Lacks advanced menu, validation, and extended features.
+> ⚠️ Note: No menu, memory, or advanced options.
+
 
 ## 📦 Example Output
 
@@ -72,63 +74,55 @@ bash <(curl -Ls https://raw.githubusercontent.com/power0matin/Iran-Firewall-Mana
 
 ## ⚠️ Warnings
 
-> 🛑 **Be very careful with the IP you enter.**
-> If you enter the wrong IP, you may **lose SSH access** to your server. Always test the tunnel before applying firewall rules.
+> 🛑 **Double-check the IP** before applying rules.
+> A wrong IP may **lock you out via SSH**. Test your tunnel before activating firewall.
 
-> 🧠 **Need extra ports like DNS/NTP?**
-> You can add rules manually before saving:
+> 🧠 **Need DNS/NTP or other system ports?**
+> Add them manually like below before saving:
 
 ```bash
 iptables -A OUTPUT -p udp --dport 53 -j ACCEPT  # DNS  
 iptables -A OUTPUT -p udp --dport 123 -j ACCEPT # NTP  
 ```
 
-> 📡 UDP is now **supported** via the interactive menu. Choose `TCP`, `UDP`, or `Both` when prompted.
+> 📡 UDP is now **fully supported** in interactive mode. Choose `TCP`, `UDP`, or `Both`.
 
 
-## 🧱 Project Phases (Upcoming)
+## 🧱 Project Roadmap
 
-The project will continue to evolve with new features and enhancements:
+| Phase          | Status      | 🔧 Planned Features                                                         | ✅ Details                                                     |
+| -------------- | ----------- | --------------------------------------------------------------------------- | ------------------------------------------------------------- |
+| 🟢 **Phase 1** | ✅ Complete  | 🔒 Basic TCP rules<br>🌐 IP allowlist<br>🚫 Default deny                    | Base implementation, save support, basic menu                 |
+| 🟡 **Phase 2** | 🔛 Current  | 📱 Menu rework<br>📦 UDP support<br>🧠 Config memory<br>🖥️ Port visibility | Full rework with usability in mind                            |
+| 🟠 **Phase 3** | 🔜 Soon     | ⏱️ Auto-revert fail-safe<br>🧪 Config profiles<br>🌗 Day/Night modes        | Prevent lockout, switch between profiles, time-based policies |
+| 🔵 **Phase 4** | ⏳ Planned   | 🌍 GeoIP blocking<br>📅 Cron apply/reset<br>💬 Language menu (EN/FA)        | Auto-rules by schedule and region, multilingual               |
+| 🟣 **Phase 5** | 🧠 Advanced | 📊 Traffic monitor<br>🚨 Telegram alerts<br>📥 External logging             | Monitor usage, notify intrusions, log centralization          |
+| 🟤 **Phase 6** | 🧪 Future   | 🐳 Docker-aware firewall<br>🔗 API interface<br>👥 Multi-admin logs/audits  | Integration with containers and dashboards                    |
 
-
-### 🧱 Project Roadmap
-
-| Phase          | Status          | 🔧 Planned Features                                                                     | ✅ Details                                                               |
-| -------------- | --------------- | --------------------------------------------------------------------------------------- | ----------------------------------------------------------------------- |
-| 🟢 **Phase 1** | ✅ Completed     | 🔒 Basic TCP rules<br>🌐 IP whitelisting<br>🚫 Block all by default                     | Foundation built with iptables, persistent rules, simple menu           |
-| 🟡 **Phase 2** | 🔛 Current      | 📱 Full menu rework<br>📦 UDP support<br>🧠 Remember last config<br>🖥️ Show open ports | Interactive secure mode, config file, ICMP off, better UX               |
-| 🟠 **Phase 3** | 🔜 Upcoming     | ⏱️ Auto-revert (timeout fail-safe)<br>🧪 Profile system<br>🌓 Day/Night schedule        | Prevent lockout, allow mode switching (dev/prod), time-based rules      |
-| 🔵 **Phase 4** | ⏳ Planned       | 🌍 GeoIP blocking<br>📅 Cron-based apply/reset\<br💬 Menu language selector (EN/FA)     | Prevent certain countries, automate daily flows, multilingual support   |
-| 🟣 **Phase 5** | 🧠 Advanced     | 📊 Traffic monitor (iftop/netstat)<br>🚨 Telegram alerts<br>📥 External logs            | Real-time usage display, intrusion alerts, log centralization           |
-| 🟤 **Phase 6** | 🧪 Experimental | 🐳 Docker-aware firewall<br>🔗 API interface<br>👥 Multi-admin log/audit                | Future: Docker integration, admin access logs, remote config management |
-
-
-🔧 **Current Phase:** `Phase 2` – Focusing on interactive usability, persistent memory, and UDP flexibility.
-📅 **Next Step:** Begin implementing auto-revert & config profiles in Phase 3.
-
-If you'd like to suggest a feature, open an [Issue](https://github.com/power0matin/Iran-Firewall-Manager/issues)!
+> 🔧 **Current Phase:** `Phase 2` – Usability, UDP support, and config memory
+> 💡 Want a feature? [Open an Issue](https://github.com/power0matin/Iran-Firewall-Manager/issues)
 
 
 ## ⚙️ Requirements
 
-* ✅ Ubuntu or Debian-based server
-* 🧑‍💻 Root access
-* 📦 `iptables` and `iptables-persistent` (auto-installed)
+* ✅ Ubuntu or Debian-based system
+* 🧑‍💻 Root privileges
+* 📦 `iptables`, `iptables-persistent` (auto-installed)
 
 
 ## ✅ Tested On
 
 * Ubuntu 20.04 / 22.04
 * Debian 11 / 12
-* VPS types: KVM, NAT, OpenVZ (IPv4 only)
+* VPS: KVM, NAT, OpenVZ (IPv4 only)
 
 
 ## 📄 License
 
-[MIT License](LICENSE) – free for personal, educational, or commercial use.
+[MIT License](LICENSE) – free for personal and commercial use.
 
 
 ## ✨ Author
 
-Created with ❤️ by [power0matin](https://github.com/power0matin)
-If you find this useful, please ⭐ the repo and share it!
+Built with ❤️ by [power0matin](https://github.com/power0matin)
+If you found it useful, please ⭐ the repo and share it 🙌
