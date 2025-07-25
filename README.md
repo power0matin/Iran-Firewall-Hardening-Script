@@ -90,28 +90,21 @@ iptables -A OUTPUT -p udp --dport 123 -j ACCEPT # NTP
 
 The project will continue to evolve with new features and enhancements:
 
-### ✅ Phase 1: Current Version (v2)
 
-* ✅ Menu-based TCP/UDP firewall setup
-* ✅ IP/Port validation
-* ✅ Ping check before applying rules
-* ✅ Persistent config saving (`last_config.log`)
-* ✅ Open ports viewer
+### 🧱 Project Roadmap
 
-### 🔜 Phase 2: Advanced Usability
+| Phase          | Status          | 🔧 Planned Features                                                                     | ✅ Details                                                               |
+| -------------- | --------------- | --------------------------------------------------------------------------------------- | ----------------------------------------------------------------------- |
+| 🟢 **Phase 1** | ✅ Completed     | 🔒 Basic TCP rules<br>🌐 IP whitelisting<br>🚫 Block all by default                     | Foundation built with iptables, persistent rules, simple menu           |
+| 🟡 **Phase 2** | 🔛 Current      | 📱 Full menu rework<br>📦 UDP support<br>🧠 Remember last config<br>🖥️ Show open ports | Interactive secure mode, config file, ICMP off, better UX               |
+| 🟠 **Phase 3** | 🔜 Upcoming     | ⏱️ Auto-revert (timeout fail-safe)<br>🧪 Profile system<br>🌓 Day/Night schedule        | Prevent lockout, allow mode switching (dev/prod), time-based rules      |
+| 🔵 **Phase 4** | ⏳ Planned       | 🌍 GeoIP blocking<br>📅 Cron-based apply/reset\<br💬 Menu language selector (EN/FA)     | Prevent certain countries, automate daily flows, multilingual support   |
+| 🟣 **Phase 5** | 🧠 Advanced     | 📊 Traffic monitor (iftop/netstat)<br>🚨 Telegram alerts<br>📥 External logs            | Real-time usage display, intrusion alerts, log centralization           |
+| 🟤 **Phase 6** | 🧪 Experimental | 🐳 Docker-aware firewall<br>🔗 API interface<br>👥 Multi-admin log/audit                | Future: Docker integration, admin access logs, remote config management |
 
-* ⏳ Auto-revert in case of wrong config (e.g., 2-minute timeout)
-* 🕒 Scheduled rule sets (day/night separation with cron)
-* 🔁 Multiple saved profiles (e.g., dev / prod modes)
-* 📅 GeoIP blocking support
 
-### 🧠 Phase 3: Smart Automation
-
-* 📊 Real-time traffic stats (iftop, conntrack)
-* ⚠️ Intrusion alert system via Telegram bot
-* 📥 Centralized logging to external server
-* 👥 Multi-admin audit logs
-* 📦 Docker/container-aware rules
+🔧 **Current Phase:** `Phase 2` – Focusing on interactive usability, persistent memory, and UDP flexibility.
+📅 **Next Step:** Begin implementing auto-revert & config profiles in Phase 3.
 
 If you'd like to suggest a feature, open an [Issue](https://github.com/power0matin/Iran-Firewall-Manager/issues)!
 
