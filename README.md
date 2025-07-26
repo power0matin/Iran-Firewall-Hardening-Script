@@ -92,12 +92,12 @@ iptables -A OUTPUT -p udp --dport 123 -j ACCEPT # NTP
 
 | Phase          | Status      | 🔧 Planned Features                                                         | ✅ Details                                                     |
 | -------------- | ----------- | --------------------------------------------------------------------------- | ------------------------------------------------------------- |
-| 🟢 **Phase 1** | ✅ Complete  | 🔒 Basic TCP rules<br>🌐 IP allowlist<br>🚫 Default deny                    | Base implementation, save support, basic menu                 |
-| 🟡 **Phase 2** | 🔛 Current  | 📱 Menu rework<br>📦 UDP support<br>🧠 Config memory<br>🖥️ Port visibility | Full rework with usability in mind                            |
-| 🟠 **Phase 3** | 🔜 Soon     | ⏱️ Auto-revert fail-safe<br>🧪 Config profiles<br>🌗 Day/Night modes        | Prevent lockout, switch between profiles, time-based policies |
-| 🔵 **Phase 4** | ⏳ Planned   | 🌍 GeoIP blocking<br>📅 Cron apply/reset<br>💬 Language menu (EN/FA)        | Auto-rules by schedule and region, multilingual               |
-| 🟣 **Phase 5** | 🧠 Advanced | 📊 Traffic monitor<br>🚨 Telegram alerts<br>📥 External logging             | Monitor usage, notify intrusions, log centralization          |
-| 🟤 **Phase 6** | 🧪 Future   | 🐳 Docker-aware firewall<br>🔗 API interface<br>👥 Multi-admin logs/audits  | Integration with containers and dashboards                    |
+| 🟢 **Phase-1** | ✅ Complete  | 🔒 Basic TCP rules<br>🌐 IP allowlist<br>🚫 Default deny                    | Base implementation, save support, basic menu                 |
+| 🟡 **Phase-2** | 🔛 Current  | 📱 Menu rework<br>📦 UDP support<br>🧠 Config memory<br>🖥️ Port visibility | Full rework with usability in mind                            |
+| 🟠 **Phase-3** | 🔜 Soon     | ⏱️ Auto-revert fail-safe<br>🧪 Config profiles<br>🌗 Day/Night modes        | Prevent lockout, switch between profiles, time-based policies |
+| 🔵 **Phase-4** | ⏳ Planned   | 🌍 GeoIP blocking<br>📅 Cron apply/reset<br>💬 Language menu (EN/FA)        | Auto-rules by schedule and region, multilingual               |
+| 🟣 **Phase-5** | 🧠 Advanced | 📊 Traffic monitor<br>🚨 Telegram alerts<br>📥 External logging             | Monitor usage, notify intrusions, log centralization          |
+| 🟤 **Phase-6** | 🧪 Future   | 🐳 Docker-aware firewall<br>🔗 API interface<br>👥 Multi-admin logs/audits  | Integration with containers and dashboards                    |
 
 > 🔧 **Current Phase:** `Phase 2` – Usability, UDP support, and config memory
 > 💡 Want a feature? [Open an Issue](https://github.com/power0matin/Iran-Firewall-Manager/issues)
